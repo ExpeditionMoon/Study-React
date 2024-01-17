@@ -1,0 +1,32 @@
+.head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+    padding: 0 10px;
+    background-color: #d282ef;
+    border-bottom: 1px solid #c757f0;
+    color: #521868;
+}
+
+.logo {
+    font-weight: bolder;
+    font-size: 30px;
+    text-decoration: none;
+}
+
+.modalBtn {
+    display: flex;
+}
+
+.modalBtn > button {
+    margin: 2px;
+    width: 50px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 0;
+    background-color: inherit;
+    color: inherit;
+    border: none;
+    cursor: pointer;
+}
