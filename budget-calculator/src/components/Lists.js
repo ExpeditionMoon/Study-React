@@ -1,5 +1,6 @@
 import React from "react";
 import List from "./List";
+import { FaRegTrashAlt } from "react-icons/fa";
 
 const Lists = ({
   budget,
@@ -30,6 +31,13 @@ const Lists = ({
     setInputCost("");
   };
 
+  const handleDeleteAll = () => {
+    setBudget([]);
+    setInputList("");
+    setInputCost("");
+    setEditId(null);
+  };
+
   return (
     <div className="list">
       {budget.map((data) => (
@@ -40,6 +48,14 @@ const Lists = ({
           onDelete={handleDelete}
         />
       ))}
+      {budget.length > 0 && (
+        <button
+          className="deleteBtn bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 justify-center rounded"
+          onClick={handleDeleteAll}
+        >
+          목록 지우기 <FaRegTrashAlt />
+        </button>
+      )}
     </div>
   );
 };

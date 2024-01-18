@@ -1,7 +1,7 @@
 import React from "react";
 import { FaRegSave } from "react-icons/fa";
 
-const CreateList = ({
+const Form = ({
   budget,
   setBudget,
   editId,
@@ -11,31 +11,34 @@ const CreateList = ({
   inputCost,
   setInputCost,
 }) => {
-  const handleInputList = () => {
-    if (editId !== null) {
-      setBudget(
-        budget.map((data) =>
-          data.id === editId
-            ? { ...data, inputList, inputCost, isEditing: false }
-            : data
-        )
-      );
-      setEditId(null);
-    } else {
-      const newList = {
-        id: new Date().getTime(),
-        inputList: inputList,
-        inputCost: parseInt(inputCost),
-        isEditing: false,
-      };
-      setBudget([...budget, newList]);
+  const handleInputList = (e) => {
+    e.preventDefault();
+    if (inputList !== "" && inputCost > 0) {
+      if (editId !== null) {
+        setBudget(
+          budget.map((data) =>
+            data.id === editId
+              ? { ...data, inputList, inputCost, isEditing: false }
+              : data
+          )
+        );
+        setEditId(null);
+      } else {
+        const newList = {
+          id: new Date().getTime(),
+          inputList: inputList,
+          inputCost: parseInt(inputCost),
+          isEditing: false,
+        };
+        setBudget([...budget, newList]);
+      }
+      setInputList("");
+      setInputCost("");
     }
-    setInputList("");
-    setInputCost("");
   };
 
   return (
-    <>
+    <form onSubmit={handleInputList}>
       <div className="item flex justify-between my-2">
         <div>
           <h5 className="font-bold">지출 항목</h5>
@@ -50,7 +53,7 @@ const CreateList = ({
         <div>
           <h5 className="font-bold">비용</h5>
           <input
-            type="text"
+            type="number"
             className="border rounded p-2"
             placeholder="0"
             value={inputCost}
@@ -58,10 +61,7 @@ const CreateList = ({
           />
         </div>
       </div>
-      <button
-        className="createBtn bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 justify-center rounded"
-        onClick={handleInputList}
-      >
+      <button className="createBtn bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 justify-center rounded">
         {editId !== null ? (
           <div>
             수정 <FaRegSave />
@@ -72,8 +72,8 @@ const CreateList = ({
           </div>
         )}
       </button>
-    </>
+    </form>
   );
 };
 
-export default CreateList;
+export default Form;
