@@ -1,0 +1,40 @@
+.home {
+  max-width: 1024px;
+  margin: auto;
+}
+.cartBox {
+  margin: 30px;
+  position: relative;
+}
+
+.cartBox > h2 {
+  text-align: center;
+}
+
+.cartDetail {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  border-bottom: 1.5px solid rgb(169, 167, 167);
+}
+
+.cartDetail img {
+  max-width: 100px;
+  max-height: 100px;
+  margin: 20px;
+}
+
+.cartDetail button {
+  position: absolute;
+  right: 20px;
+  background-color: #edebeb;
+  border: 0.5px solid lightgray;
+  border-radius: 2px;
+  font-size: 15px;
+  width: 50px;
+  cursor: pointer;
+}
+
+.cartInfo {
+  width: 60%;
+}
