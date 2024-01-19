@@ -33,7 +33,7 @@ export default function ProductDetail() {
   };
 
   return (
-    <div>
+    <div className="detailBox">
       <Header />
       <div className="infoBox">
         <div className="detail" key={id}>

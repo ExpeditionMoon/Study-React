@@ -24,6 +24,7 @@ export default function LoginModal({
   }
 
   const hadleModalChange = () => {
+    setMessage("");
     link();
     onClose();
   };

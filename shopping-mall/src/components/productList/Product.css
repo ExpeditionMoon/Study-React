@@ -79,6 +79,10 @@ button:hover {
 
 
 /* ProductDetail */
+.detailBox {
+    max-width: 1024px;
+    margin: auto;
+}
 .infoBox {
     margin: 20px 0;
     display: flex;

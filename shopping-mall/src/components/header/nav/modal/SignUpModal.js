@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import "./Modal.css";
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import useOutsideClick from "../../../hook/useOutsideClick";
+import app from "../../../../firebase";
 
 export default function SignUpModal({
   link,
@@ -22,6 +23,7 @@ export default function SignUpModal({
   }
 
   const hadleModalChange = () => {
+    setMessage("");
     link();
     onClose();
   };
@@ -51,10 +53,11 @@ export default function SignUpModal({
       return;
     }
 
-    const auth = getAuth();
+    const auth = getAuth(app);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       saveEmailToLocalStorage(email);
+      setMessage("");
       link();
       onClose();
     } catch (error) {
