@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import instance from "../api/instance";
 import Header from "../header/Header";
+import useCart from "../hook/useCart";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState([]);
+  const [cart, addToCart] = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const product = async () => {
@@ -25,7 +28,9 @@ export default function ProductDetail() {
     return <div>상품에 대한 정보가 존재하지 않습니다.</div>;
   }
 
-  const handleCart = () => {};
+  const navigateCart = () => {
+    navigate("/cart");
+  };
 
   return (
     <div>
@@ -38,8 +43,8 @@ export default function ProductDetail() {
             <h2>${product.price}</h2>
             <p>{product.description}</p>
             <div>
-              <button onCart={handleCart}>장바구니 담기</button>
-              <button onCart={handleCart}>장바구니 이동</button>
+              <button onClick={() => addToCart(product)}>장바구니 담기</button>
+              <button onClick={navigateCart}>장바구니 이동</button>
             </div>
           </div>
         </div>

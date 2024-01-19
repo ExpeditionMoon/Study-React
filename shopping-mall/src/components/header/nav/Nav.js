@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SignUpModal from "./modal/SignUpModal";
 import LoginModal from "./modal/LoginModal";
+import { useNavigate } from "react-router-dom";
 
 export default function Nav() {
   const [email, setEmail] = useState("");
@@ -8,6 +9,7 @@ export default function Nav() {
   const [showSingUp, setShowSingUp] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loginState = localStorage.getItem("isLogin") === "true";
@@ -44,10 +46,14 @@ export default function Nav() {
     localStorage.removeItem("isLogin");
   };
 
+  const navigateCart = () => {
+    navigate("/cart");
+  };
+
   return (
     <div>
       <div className="modalBtn">
-        <button>Cart</button>
+        <button onClick={navigateCart}>Cart</button>
         {!isLogin ? (
           <>
             <button onClick={handleShowSignUp}>Sign Up</button>

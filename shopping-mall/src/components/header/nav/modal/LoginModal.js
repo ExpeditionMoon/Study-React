@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import "./Modal.css";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import app from "../../../../firebase";
+import useOutsideClick from "../../../hook/useOutsideClick";
 
 export default function LoginModal({
   link,
@@ -16,20 +17,7 @@ export default function LoginModal({
   const modalRef = useRef();
   const [message, setMessage] = useState("");
 
-  // 모달 외부 클릭할 경우
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (modalRef.current && !modalRef.current.contains(e.target)) {
-        onClose();
-        setEmail("");
-        setPassword("");
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [onClose]);
+  useOutsideClick(modalRef, onClose);
 
   if (!show) {
     return null;
