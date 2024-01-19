@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Modal.css";
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import app from "../../../../firebase";
 
 export default function SignUpModal({
   link,
@@ -32,21 +31,45 @@ export default function SignUpModal({
     return null;
   }
 
-  const handleSingUp = async (e) => {
-    e.preventDefault();
-    const auth = getAuth(app);
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      link();
-      onClose();
-    } catch (error) {
-      return error && setMessage("비밀번호는 6자리 이상입니다.");
-    }
-  };
-
   const hadleModalChange = () => {
     link();
     onClose();
+  };
+
+  // 중복 이메일인지 확인
+  const isEmail = (email) => {
+    const saveEmails = localStorage.getItem("userEmails");
+    if (!saveEmails) {
+      return false;
+    }
+    const emails = JSON.parse(saveEmails);
+    return emails.includes(email);
+  };
+  // 회원가입할 경우, 이메일 저장
+  const saveEmailToLocalStorage = (email) => {
+    const saveEmails = localStorage.getItem("userEmails");
+    const emails = saveEmails ? JSON.parse(saveEmails) : [];
+    emails.push(email);
+    localStorage.setItem("userEmails", JSON.stringify(emails));
+  };
+
+  // 회원가입
+  const handleSingUp = async (e) => {
+    e.preventDefault();
+    if (isEmail(email)) {
+      setMessage("이미 등록된 이메일입니다.");
+      return;
+    }
+
+    const auth = getAuth();
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      saveEmailToLocalStorage(email);
+      link();
+      onClose();
+    } catch (error) {
+      return error && setMessage("유효하지 않은 형식입니다.");
+    }
   };
 
   return (
@@ -67,7 +90,7 @@ export default function SignUpModal({
               <p>Password: </p>
               <input
                 type="password"
-                placeholder="비밀번호"
+                placeholder="6자리 이상 비밀번호"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

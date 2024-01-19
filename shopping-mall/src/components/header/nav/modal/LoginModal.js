@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import "./Modal.css";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import app from "../../../../firebase";
-import { useNavigate } from "react-router-dom";
 
 export default function LoginModal({
   link,
@@ -12,9 +11,9 @@ export default function LoginModal({
   setEmail,
   password,
   setPassword,
+  onLogin,
 }) {
   const modalRef = useRef();
-  const navgate = useNavigate();
   const [message, setMessage] = useState("");
 
   // 모달 외부 클릭할 경우
@@ -36,21 +35,22 @@ export default function LoginModal({
     return null;
   }
 
+  const hadleModalChange = () => {
+    link();
+    onClose();
+  };
+
+  // 로그인
   const handleLogin = async (e) => {
     e.preventDefault();
     const auth = getAuth(app);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navgate('/');
+      onLogin();
       onClose();
     } catch (error) {
       return error && setMessage("이메일 또는 비밀번호가 잘못되었습니다.");
     }
-  };
-
-  const hadleModalChange = () => {
-    link();
-    onClose();
   };
 
   return (
@@ -70,7 +70,7 @@ export default function LoginModal({
             <p>Password: </p>
             <input
               type="password"
-              placeholder="비밀번호"
+              placeholder="6자리 이상 비밀번호"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
