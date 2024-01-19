@@ -1,15 +1,29 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Modal.css";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import app from "../../../../firebase";
+import { useNavigate } from "react-router-dom";
 
-export default function SignUpModal({ show, onClose, email, setEmail, password, setPassword }) {
+export default function LoginModal({
+  link,
+  show,
+  onClose,
+  email,
+  setEmail,
+  password,
+  setPassword,
+}) {
   const modalRef = useRef();
+  const navgate = useNavigate();
+  const [message, setMessage] = useState("");
 
   // 모달 외부 클릭할 경우
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
         onClose();
+        setEmail("");
+        setPassword("");
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -22,20 +36,27 @@ export default function SignUpModal({ show, onClose, email, setEmail, password, 
     return null;
   }
 
-  const handleLogin = async () => {
-    const auth = getAuth();
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const auth = getAuth(app);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      console.log("회원가입 완료!");
+      await signInWithEmailAndPassword(auth, email, password);
+      navgate('/');
+      onClose();
     } catch (error) {
-      console.error("error : ", error);
+      return error && setMessage("이메일 또는 비밀번호가 잘못되었습니다.");
     }
+  };
+
+  const hadleModalChange = () => {
+    link();
+    onClose();
   };
 
   return (
     <div className="modalBox">
       <div className="modal" ref={modalRef}>
-        <div className="inputTxt">
+        <form className="inputTxt">
           <div>
             <p> ID: </p>
             <input
@@ -54,8 +75,12 @@ export default function SignUpModal({ show, onClose, email, setEmail, password, 
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button onClick={handleLogin}>Sign Up</button>
-        </div>
+          <button onClick={handleLogin}>Login</button>
+          {message && <span>{message}</span>}
+        </form>
+        <p>
+          계정이 있습니까? <button onClick={hadleModalChange}>Sign Up</button>
+        </p>
       </div>
     </div>
   );
