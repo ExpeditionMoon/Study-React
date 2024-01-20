@@ -1,22 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./Cart.css";
 import Header from "../header/Header";
+import { useDispatch, useSelector } from "react-redux";
+import { removeFromCart } from "../../redux/cartSlice";
 
 export default function Cart() {
-  const [cart, setCart] = useState([]);
+  const cart = useSelector((state) => state.cart.cart);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
 
-  // 장바구니 불러오기
-  useEffect(() => {
-    const savedCart = localStorage.getItem("cart");
-    if (savedCart) {
-      setCart(JSON.parse(savedCart));
+  const handleRemoveFromCart = (product) => {
+    if (user && user.id) {
+      dispatch(removeFromCart({ userId: user.uid, productId: product.id }));
+    } else {
+      console.log("로그인하지 않았습니다.");
     }
-  }, []);
-
-  const removeCart = (product) => {
-    const newCart = cart.filter((item) => item.id !== product.id);
-    setCart(newCart);
-    localStorage.setItem("cart", JSON.stringify(newCart));
   };
 
   return (
@@ -24,16 +22,22 @@ export default function Cart() {
       <Header />
       <div className="cartBox">
         <h2>장바구니</h2>
-        {cart.map((product) => (
-          <div className="cartDetail" key={product.id}>
-            <img src={product.image} alt={product.title} />
-            <div className="cartInfo">
-              <h3>{product.title}</h3>
-              <h2>${product.price}</h2>
+        {cart.length === 0 ? (
+          <p>장바구니가 비어 있습니다.</p>
+        ) : (
+          cart.map((product) => (
+            <div className="cartDetail" key={product.id}>
+              <img src={product.image} alt={product.title} />
+              <div className="cartInfo">
+                <h3>{product.title}</h3>
+                <h2>${product.price}</h2>
+              </div>
+              <button onClick={() => handleRemoveFromCart(product)}>
+                삭제
+              </button>
             </div>
-            <button onClick={() => removeCart(product)}>삭제</button>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

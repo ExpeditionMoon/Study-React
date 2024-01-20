@@ -1,20 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import SignUpModal from "./modal/SignUpModal";
 import LoginModal from "./modal/LoginModal";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../../redux/authSlice";
 
 export default function Nav() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showSingUp, setShowSingUp] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const loginState = localStorage.getItem("isLogin") === "true";
-    setIsLogin(loginState);
-  }, []);
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   // 모달창 열기
   const handleShowSignUp = () => {
@@ -34,16 +32,10 @@ export default function Nav() {
     setEmail("");
     setPassword("");
   };
-
-  // 로그인할 경우
-  const handleLogin = () => {
-    setIsLogin(true);
-    localStorage.setItem("isLogin", true);
-  };
-  // 로그아웃할 경우
+  // 로그아웃
   const handleLogout = () => {
-    setIsLogin(false);
-    localStorage.removeItem("isLogin");
+    dispatch(logout());
+    handleCloseLogin();
   };
 
   const navigateCart = () => {
@@ -54,7 +46,7 @@ export default function Nav() {
     <div>
       <div className="modalBtn">
         <button onClick={navigateCart}>Cart</button>
-        {!isLogin ? (
+        {!isAuthenticated ? (
           <>
             <button onClick={handleShowSignUp}>Sign Up</button>
             <SignUpModal
@@ -75,7 +67,6 @@ export default function Nav() {
               link={handleShowSignUp}
               show={showLogin}
               onClose={handleCloseLogin}
-              onLogin={handleLogin}
             />
           </>
         ) : (

@@ -1,8 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import "./Modal.css";
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import useOutsideClick from "../../../hook/useOutsideClick";
-import app from "../../../../firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { singUp } from "../../../../redux/authSlice";
 
 export default function SignUpModal({
   link,
@@ -14,55 +14,36 @@ export default function SignUpModal({
   setPassword,
 }) {
   const modalRef = useRef();
-  const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
+  const message = useSelector((state) => state.auth.error);
+  const success = useSelector((state) => state.auth.success);
 
-  useOutsideClick(modalRef, onClose);
+  useEffect(() => {
+    if (success === "success") {
+      link();
+      onClose();
+    }
+  }, [success, link, onClose]);
+
+  useOutsideClick(modalRef, () => {
+    onClose();
+    dispatch({ type: "auth/resetError" });
+  });
 
   if (!show) {
     return null;
   }
 
   const hadleModalChange = () => {
-    setMessage("");
     link();
     onClose();
-  };
-
-  // 중복 이메일인지 확인
-  const isEmail = (email) => {
-    const saveEmails = localStorage.getItem("userEmails");
-    if (!saveEmails) {
-      return false;
-    }
-    const emails = JSON.parse(saveEmails);
-    return emails.includes(email);
-  };
-  // 회원가입할 경우, 이메일 저장
-  const saveEmailToLocalStorage = (email) => {
-    const saveEmails = localStorage.getItem("userEmails");
-    const emails = saveEmails ? JSON.parse(saveEmails) : [];
-    emails.push(email);
-    localStorage.setItem("userEmails", JSON.stringify(emails));
+    dispatch({ type: "auth/resetError" });
   };
 
   // 회원가입
   const handleSingUp = async (e) => {
     e.preventDefault();
-    if (isEmail(email)) {
-      setMessage("이미 등록된 이메일입니다.");
-      return;
-    }
-
-    const auth = getAuth(app);
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      saveEmailToLocalStorage(email);
-      setMessage("");
-      link();
-      onClose();
-    } catch (error) {
-      return error && setMessage("유효하지 않은 형식입니다.");
-    }
+    dispatch(singUp({ email, password }));
   };
 
   return (
