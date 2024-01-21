@@ -1,7 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import "./Modal.css";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import app from "../../../../firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../../../redux/authSlice";
 import useOutsideClick from "../../../hook/useOutsideClick";
 
 export default function LoginModal({
@@ -12,34 +12,30 @@ export default function LoginModal({
   setEmail,
   password,
   setPassword,
-  onLogin,
 }) {
   const modalRef = useRef();
-  const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
+  const message = useSelector((state) => state.auth.error);
 
-  useOutsideClick(modalRef, onClose);
+  useOutsideClick(modalRef, () => {
+    onClose();
+    dispatch({ type: "auth/resetError" });
+  });
 
   if (!show) {
     return null;
   }
 
   const hadleModalChange = () => {
-    setMessage("");
     link();
     onClose();
+    dispatch({ type: "auth/resetError" });
   };
 
   // 로그인
   const handleLogin = async (e) => {
     e.preventDefault();
-    const auth = getAuth(app);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      onLogin();
-      onClose();
-    } catch (error) {
-      return error && setMessage("이메일 또는 비밀번호가 잘못되었습니다.");
-    }
+    dispatch(login({ email, password }));
   };
 
   return (

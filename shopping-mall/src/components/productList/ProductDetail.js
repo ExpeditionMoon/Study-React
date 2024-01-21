@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import instance from "../api/instance";
 import Header from "../header/Header";
-import useCart from "../hook/useCart";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../../redux/cartSlice";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState([]);
-  const [cart, addToCart] = useCart();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     const product = async () => {
@@ -28,6 +30,14 @@ export default function ProductDetail() {
     return <div>상품에 대한 정보가 존재하지 않습니다.</div>;
   }
 
+  const handleAddToCart = (product) => {
+    if (user && user.uid) {
+      dispatch(addToCart({ userId: user.uid, product: product }));
+    } else {
+      console.log("로그인하지 않았습니다.");
+    }
+  };
+
   const navigateCart = () => {
     navigate("/cart");
   };
@@ -43,7 +53,9 @@ export default function ProductDetail() {
             <h2>${product.price}</h2>
             <p>{product.description}</p>
             <div>
-              <button onClick={() => addToCart(product)}>장바구니 담기</button>
+              <button onClick={() => handleAddToCart(product)}>
+                장바구니 담기
+              </button>
               <button onClick={navigateCart}>장바구니 이동</button>
             </div>
           </div>
