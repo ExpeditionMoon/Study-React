@@ -15,7 +15,7 @@ export default function LoginModal({
 }) {
   const modalRef = useRef();
   const dispatch = useDispatch();
-  const message = useSelector(state => state.auth.error);
+  const message = useSelector((state) => state.auth.error);
 
   useOutsideClick(modalRef, () => {
     onClose();

@@ -1,16 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Cart.css";
 import Header from "../header/Header";
 import { useDispatch, useSelector } from "react-redux";
-import { removeFromCart } from "../../redux/cartSlice";
+import { getCartLists, removeFromCart } from "../../redux/cartSlice";
 
 export default function Cart() {
-  const cart = useSelector((state) => state.cart.cart);
   const dispatch = useDispatch();
+  const cart = useSelector((state) => state.cart.cart);
   const user = useSelector((state) => state.auth.user);
 
+  useEffect(() => {
+    if (user && user.uid) {
+      dispatch(getCartLists(user.uid));
+    }
+  }, [user, dispatch]);
+
   const handleRemoveFromCart = (product) => {
-    if (user && user.id) {
+    if (user && user.uid) {
       dispatch(removeFromCart({ userId: user.uid, productId: product.id }));
     } else {
       console.log("로그인하지 않았습니다.");

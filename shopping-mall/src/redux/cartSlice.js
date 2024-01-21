@@ -1,17 +1,31 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import app from "../firebase";
-import { collection, deleteDoc, doc, getDocs, getFirestore, setDoc } from "@firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  getFirestore,
+  setDoc,
+} from "@firebase/firestore";
 
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async ({ userId, product }, thunkAPI) => {
-    console.log(userId);
     try {
       const db = getFirestore(app);
-      await setDoc(doc(db, "cart", userId, "products", product.id), product);
-      // await setDoc(doc(db, "carts", "products"), product);
-      return product;
+      const docData = await addDoc(
+        collection(db, "cart", userId, "products"),
+        product
+      );
+      if (docData && docData.id && product) {
+        return { ...product, id: docData.id };
+      } else {
+        throw new Error("사용자를 찾을 수 없습니다.");
+      }
     } catch (error) {
+      console.log(error);
       return thunkAPI.rejectWithValue(error.message);
     }
   }
@@ -22,8 +36,8 @@ export const getCartLists = createAsyncThunk(
   async (userId, thunkAPI) => {
     try {
       const db = getFirestore(app);
-      const lists = await getDocs(collection(db, "cart", userId));
-      return lists.docs.map((doc) => doc.data());
+      const lists = await getDocs(collection(db, "cart", userId, "products"));
+      return lists.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -45,6 +59,7 @@ export const removeFromCart = createAsyncThunk(
 
 const initialState = {
   cart: [],
+  isLoading: false,
   error: null,
 };
 
@@ -54,20 +69,31 @@ const cartSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(addToCart.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(addToCart.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
         state.cart.push(action.payload);
       })
       .addCase(addToCart.rejected, (state, action) => {
+        state.isLoading = false;
         state.error = action.payload;
       })
       .addCase(getCartLists.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
         state.cart = action.payload;
       })
       .addCase(getCartLists.rejected, (state, action) => {
         state.error = action.payload;
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
-        state.cart = state.cart.filter(product => product.id !== action.payload);
+        state.cart = state.cart.filter(
+          (product) => product.id !== action.payload
+        );
       })
       .addCase(removeFromCart.rejected, (state, action) => {
         state.error = action.payload;
@@ -75,5 +101,4 @@ const cartSlice = createSlice({
   },
 });
 
-// export const { addToCart, removeFromCart } = cartSlice.actions;
 export default cartSlice.reducer;

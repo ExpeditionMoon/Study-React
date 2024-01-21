@@ -4,14 +4,12 @@ import { Link } from "react-router-dom";
 import instance from "../api/instance";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../redux/cartSlice";
-// import useCart from "../hook/useCart";
 
 export default function ProductLists() {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("");
-  // const [cart, addToCart] = useCart();
   const dispatch = useDispatch();
-  const user = useSelector(state => state.auth.user);
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     const getProduct = async () => {
@@ -29,16 +27,14 @@ export default function ProductLists() {
     };
     getProduct();
   }, [category]);
-  
-  const handleAddToCart = (product) => {
-    console.log(user);
 
+  const handleAddToCart = (product) => {
     if (user && user.uid) {
       dispatch(addToCart({ userId: user.uid, product: product }));
     } else {
       console.log("로그인하지 않았습니다.");
     }
-  }
+  };
 
   return (
     <>
@@ -54,12 +50,14 @@ export default function ProductLists() {
       <div className="lists">
         {products.map((product) => (
           <div className="item" key={product.id}>
-            <Link to={`products/${product.id}`} >
+            <Link to={`products/${product.id}`}>
               <img src={product.image} alt={product.title} />
               <h5>{product.title}</h5>
             </Link>
             <div>
-              <button onClick={() => handleAddToCart(product)}>장바구니 담기</button>
+              <button onClick={() => handleAddToCart(product)}>
+                장바구니 담기
+              </button>
               <p>${product.price}</p>
             </div>
           </div>
